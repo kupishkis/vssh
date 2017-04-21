@@ -1,0 +1,4 @@
+#compdef vssh
+
+_arguments \
+  ':host:_hosts'

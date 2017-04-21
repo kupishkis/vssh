@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+show_help() {
+cat << EOF
+Usage: ${0##*/} ip|host
+
+Following variables should be declared before launching this wrapper:
+
+    VAULT_ADDR                | export VAULT_ADDR=https://example.com:8200
+    VAULT_USER                | default '$USER'
+    VAULT_SSH_ROLE            | default 'ssh'
+    STRICT_HOST_KEY_CHECKING  | default 'no'
+
+    -h          display this help and exit
+
+EOF
+}
+
+case $1 in
+  -h|--h|-help|--help)
+    show_help
+    exit 0
+  ;;
+  *)
+  ;;
+esac
+
+if [[ -z $VAULT_ADDR ]]; then
+  show_help
+  exit 0
+fi
+
+if [[ -z $VAULT_USER ]]; then
+  export VAULT_USER=$USER
+fi
+
+if [[ -z $VAULT_SSH_ROLE ]]; then
+  export VAULT_SSH_ROLE=ssh
+fi
+
+if [[ -z STRICT_HOST_KEY_CHECKING ]]; then
+  export STRICT_HOST_KEY_CHECKING=no
+fi
+
+vault ssh -role $VAULT_SSH_ROLE -strict-host-key-checking=$STRICT_HOST_KEY_CHECKING $VAULT_USER@$1
+
